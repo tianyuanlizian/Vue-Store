@@ -7,7 +7,7 @@
  -->
 <template>
   <div id="register">
-    <el-dialog title="注册" width="300px" center :visible.sync="isRegister">
+    <el-dialog title="注册" width="400px" center :visible.sync="isRegister">
       <el-form
         :model="RegisterUser"
         :rules="rules"
@@ -15,11 +15,29 @@
         ref="ruleForm"
         class="demo-ruleForm"
       >
+        <el-form-item label= "头像：">
+          <el-upload
+            class="avatar-uploader"
+            action="/api/upload"
+            :show-file-list="false"
+            :on-success="handleAvatarSuccess"
+            :before-upload="beforeAvatarUpload">
+              <img v-if="RegisterUser.photo" :src="RegisterUser.photo"  class="avatar">
+              <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+        </el-upload>
+        </el-form-item>
         <el-form-item prop="name">
           <el-input
             prefix-icon="el-icon-user-solid"
-            placeholder="请输入账号"
+            placeholder="请输入用户名"
             v-model="RegisterUser.name"
+          ></el-input>
+        </el-form-item>
+        <el-form-item prop="account">
+          <el-input
+            prefix-icon="el-icon-user-solid"
+            placeholder="请输入账号"
+            v-model="RegisterUser.account"
           ></el-input>
         </el-form-item>
         <el-form-item prop="pass">
@@ -38,6 +56,27 @@
             v-model="RegisterUser.confirmPass"
           ></el-input>
         </el-form-item>
+        <el-form-item label="性别：" prop="sex">
+          <el-radio-group v-model="RegisterUser.sex">
+            <el-radio label="保密"></el-radio>
+            <el-radio label="男"></el-radio>
+            <el-radio label="女"></el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item prop="email">
+          <el-input
+            prefix-icon="el-icon-user-solid"
+            placeholder="请输入邮箱"
+            v-model="RegisterUser.email"
+          ></el-input>
+        </el-form-item>
+        <el-form-item prop="phone">
+          <el-input
+            prefix-icon="el-icon-user-solid"
+            placeholder="请输入手机号"
+            v-model="RegisterUser.phone"
+          ></el-input>
+        </el-form-item>
         <el-form-item>
           <el-button size="medium" type="primary" @click="Register" style="width:100%;">注册</el-button>
         </el-form-item>
@@ -51,48 +90,44 @@ export default {
   props: ["register"],
   data() {
     // 用户名的校验方法
-    let validateName = (rule, value, callback) => {
-      if (!value) {
+    let validateName  = (rule, value, callback) => {
+      if (value === "") {
         return callback(new Error("请输入用户名"));
       }
-      // 用户名以字母开头,长度在5-16之间,允许字母数字下划线
-      const userNameRule = /^[a-zA-Z][a-zA-Z0-9_]{4,15}$/;
-      if (userNameRule.test(value)) {
-        //判断数据库中是否已经存在该用户名
-        this.$axios
-          .post("/api/users/findUserName", {
-            userName: this.RegisterUser.name
-          })
-          .then(res => {
-            // “001”代表用户名不存在，可以注册
-            if (res.data.code == "001") {
-              this.$refs.ruleForm.validateField("checkPass");
-              return callback();
-            } else {
-              return callback(new Error(res.data.msg));
-            }
-          })
-          .catch(err => {
-            return Promise.reject(err);
-          });
-      } else {
-        return callback(new Error("字母开头,长度5-16之间,允许字母数字下划线"));
+    };
+    // 账号的校验方法
+    let validateAccount = (rule, value, callback) => {
+      if (!value) {
+        return callback(new Error("请输入账号"));
       }
+      // 用户名以字母开头,长度在5-16之间,允许字母数字下划线
+      // const userNameRule = /^[a-zA-Z][a-zA-Z0-9_]{4,15}$/;
+      // if (userNameRule.test(value)) {
+      //   //判断数据库中是否已经存在该用户名
+      //   this.$axios
+      //     .post("/api/users/findUserName", {
+      //       userName: this.RegisterUser.name
+      //     })
+      //     .then(res => {
+      //       // “001”代表用户名不存在，可以注册
+      //       if (res.data.code == "001") {
+      //         this.$refs.ruleForm.validateField("checkPass");
+      //         return callback();
+      //       } else {
+      //         return callback(new Error(res.data.msg));
+      //       }
+      //     })
+      //     .catch(err => {
+      //       return Promise.reject(err);
+      //     });
+      // } else {
+      //   return callback(new Error("字母开头,长度5-16之间,允许字母数字下划线"));
+      // }
     };
     // 密码的校验方法
     let validatePass = (rule, value, callback) => {
       if (value === "") {
         return callback(new Error("请输入密码"));
-      }
-      // 密码以字母开头,长度在6-18之间,允许字母数字和下划线
-      const passwordRule = /^[a-zA-Z]\w{5,17}$/;
-      if (passwordRule.test(value)) {
-        this.$refs.ruleForm.validateField("checkPass");
-        return callback();
-      } else {
-        return callback(
-          new Error("字母开头,长度6-18之间,允许字母数字和下划线")
-        );
       }
     };
     // 确认密码的校验方法
@@ -108,18 +143,38 @@ export default {
         return callback(new Error("两次输入的密码不一致"));
       }
     };
+    // 邮箱的校验方法
+    let validateEmail  = (rule, value, callback) => {
+    if (value === "") {
+      return callback(new Error("请输入邮箱"));
+    }
+    };
+    // 手机号的校验方法
+    let validatePhone  = (rule, value, callback) => {
+    if (value === "") {
+      return callback(new Error("请输入手机号"));
+    }
+    };
     return {
       isRegister: false, // 控制注册组件是否显示
       RegisterUser: {
         name: "",
+        account:"",
         pass: "",
-        confirmPass: ""
+        confirmPass: "",
+        sex:"",
+        email:"",
+        phone:"",
+        photo:""
       },
       // 用户信息校验规则,validator(校验方法),trigger(触发方式),blur为在组件 Input 失去焦点时触发
       rules: {
         name: [{ validator: validateName, trigger: "blur" }],
+        account: [{ validator: validateAccount, trigger: "blur" }],
         pass: [{ validator: validatePass, trigger: "blur" }],
-        confirmPass: [{ validator: validateConfirmPass, trigger: "blur" }]
+        confirmPass: [{ validator: validateConfirmPass, trigger: "blur" }],
+        email: [{ validator: validateEmail, trigger: "blur" }],
+        phone: [{ validator: validatePhone, trigger: "blur" }]
       }
     };
   },
@@ -168,9 +223,43 @@ export default {
           return false;
         }
       });
-    }
+    },
+    beforeAvatarUpload(file) {
+       const isLt2M = file.size / 1024 / 1024 < 2;
+       if (!isLt2M) {
+          this.$message.error('上传头像图片大小不能超过 2MB!');
+         }
+        return isLt2M;
+   },
+   handleAvatarSuccess(res) {
+      this.RegisterUser.photo = res; // 假设后端返回的是图片的访问路径
+  },
   }
 };
 </script>
 <style>
+@import url("//unpkg.com/element-ui@2.15.14/lib/theme-chalk/index.css");
+    .avatar-uploader .el-upload {
+        border: 1px dashed #d9d9d9;
+        border-radius: 6px;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+    }
+    .avatar-uploader .el-upload:hover {
+        border-color: #409EFF;
+    }
+    .avatar-uploader-icon {
+        font-size: 28px;
+        color: #8c939d;
+        width: 178px;
+        height: 150px;
+        line-height: 150px;
+        text-align: center;
+    }
+    .avatar {
+        width: 178px;
+        height: 150px;
+        display: block;
+    }
 </style>
