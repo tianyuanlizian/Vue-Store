@@ -26,9 +26,9 @@
         <el-tabs v-model="activeName" type="card">
           <el-tab-pane
             v-for="item in categoryList"
-            :key="item.category_id"
-            :label="item.category_name"
-            :name="''+item.category_id"
+            :key="item.tid"
+            :label="item.name"
+            :name="''+item.tid"
           />
         </el-tabs>
       </div>
@@ -166,15 +166,16 @@ export default {
     // 向后端请求分类列表数据
     getCategory() {
       this.$axios
-        .post("/api/product/getCategory", {})
+        .get("/api/typesList")
         .then(res => {
           const val = {
-            category_id: 0,
-            category_name: "全部"
+            tid: 0,
+            name: "全部"
           };
-          const cate = res.data.category;
+          const cate = res.data.data;
           cate.unshift(val);
           this.categoryList = cate;
+          console.log(cate)
         })
         .catch(err => {
           return Promise.reject(err);
@@ -185,17 +186,17 @@ export default {
       // 如果分类列表为空则请求全部商品数据，否则请求分类商品数据
       const api =
         this.categoryID.length == 0
-          ? "/api/product/getAllProduct"
-          : "/api/product/getProductByCategory";
+         ? "/api/commodityList"
+         : "/api/listCommodityByType";
       this.$axios
-        .post(api, {
-          categoryID: this.categoryID,
-          currentPage: this.currentPage,
-          pageSize: this.pageSize
+        .get(api,{
+          params:{
+            tid:this.categoryID.join()
+          }
         })
         .then(res => {
-          this.product = res.data.Product;
-          this.total = res.data.total;
+          this.product = res.data.data;
+          this.total = res.data.count;
         })
         .catch(err => {
           return Promise.reject(err);

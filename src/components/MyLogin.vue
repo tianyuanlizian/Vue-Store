@@ -38,30 +38,14 @@ export default {
       if (!value) {
         return callback(new Error("请输入用户名"));
       }
-      // 用户名以字母开头,长度在5-16之间,允许字母数字下划线
-      const userNameRule = /^[a-zA-Z][a-zA-Z0-9_]{4,15}$/;
-      if (userNameRule.test(value)) {
-        this.$refs.ruleForm.validateField("checkPass");
-        return callback();
-      } else {
-        return callback(new Error("字母开头,长度5-16之间,允许字母数字下划线"));
-      }
+      return callback();
     };
     // 密码的校验方法
     let validatePass = (rule, value, callback) => {
       if (value === "") {
         return callback(new Error("请输入密码"));
       }
-      // 密码以字母开头,长度在6-18之间,允许字母数字和下划线
-      const passwordRule = /^[a-zA-Z]\w{5,17}$/;
-      if (passwordRule.test(value)) {
-        this.$refs.ruleForm.validateField("checkPass");
-        return callback();
-      } else {
-        return callback(
-          new Error("字母开头,长度6-18之间,允许字母数字和下划线")
-        );
-      }
+      return callback();
     };
     return {
       LoginUser: {
@@ -95,20 +79,21 @@ export default {
         //如果通过校验开始登录
         if (valid) {
           this.$axios
-            .post("/api/users/login", {
-              userName: this.LoginUser.name,
+            .post("/api/appLogin", {
+              account: this.LoginUser.name,
               password: this.LoginUser.pass
             })
             .then(res => {
               // “001”代表登录成功，其他的均为失败
-              if (res.data.code === "001") {
+              if (res.data.code === 200) {
+                console.log(res);
                 // 隐藏登录组件
                 this.isLogin = false;
                 // 登录信息存到本地
-                let user = JSON.stringify(res.data.user);
+                let user = JSON.stringify(res.data.data);
                 localStorage.setItem("user", user);
                 // 登录信息存到vuex
-                this.setUser(res.data.user);
+                this.setUser(res.data.data);
                 // 弹出通知框提示登录成功信息
                 this.notifySucceed(res.data.msg);
               } else {
@@ -121,11 +106,11 @@ export default {
             .catch(err => {
               return Promise.reject(err);
             });
-        } else {
-          return false;
+          }else{
+            return false;
+          }
+        })
         }
-      });
-    }
   }
 };
 </script>

@@ -10,7 +10,7 @@
     <!-- 头部 -->
     <div class="page-header">
       <div class="title">
-        <p>{{productDetails.product_name}}</p>
+        <p>{{productDetails.bname}}</p>
         <div class="list">
           <ul>
             <li>
@@ -32,43 +32,27 @@
     <div class="main">
       <!-- 左侧商品轮播图 -->
       <div class="block">
-        <el-carousel height="560px" v-if="productPicture.length>1">
-          <el-carousel-item v-for="item in productPicture" :key="item.id">
-            <img style="height:560px;" :src="$target + item.product_picture" :alt="item.intro" />
-          </el-carousel-item>
+        <el-carousel height="560px" v-if="productPicture">
+            <img style="height:560px;" :src="productPicture"/>
         </el-carousel>
-        <div v-if="productPicture.length==1">
-          <img
-            style="height:560px;"
-            :src="$target + productPicture[0].product_picture"
-            :alt="productPicture[0].intro"
-          />
-        </div>
       </div>
       <!-- 左侧商品轮播图END -->
 
       <!-- 右侧内容区 -->
       <div class="content">
-        <h1 class="name">{{productDetails.product_name}}</h1>
-        <p class="intro">{{productDetails.product_intro}}</p>
-        <p class="store">小米自营</p>
+        <h1 class="name">{{productDetails.bname}}</h1>
+        <p class="intro">{{productDetails.notes}}</p>
         <div class="price">
-          <span>{{productDetails.product_selling_price}}元</span>
-          <span
-            v-show="productDetails.product_price != productDetails.product_selling_price"
-            class="del"
-          >{{productDetails.product_price}}元</span>
+          <span>类型: {{productDetails.types.name}}</span> |
+          <span>作者: {{productDetails.author}}</span> |
+          <span>出版社: {{productDetails.press}}</span> |
+          <span>发行日期: {{productDetails.issuingDate}}</span> |
         </div>
         <div class="pro-list">
-          <span class="pro-name">{{productDetails.product_name}}</span>
+          <span class="pro-name">{{productDetails.bname}}</span>
           <span class="pro-price">
-            <span>{{productDetails.product_selling_price}}元</span>
-            <span
-              v-show="productDetails.product_price != productDetails.product_selling_price"
-              class="pro-del"
-            >{{productDetails.product_price}}元</span>
           </span>
-          <p class="price-sum">总计 : {{productDetails.product_selling_price}}元</p>
+          <p class="price-sum">总计 : {{productDetails.inventory}}元</p>
         </div>
         <!-- 内容区底部按钮 -->
         <div class="button">
@@ -99,7 +83,7 @@
   </div>
 </template>
 <script>
-import { mapActions } from "vuex";
+//import { mapActions } from "vuex";
 export default {
   data() {
     return {
@@ -119,37 +103,40 @@ export default {
     // 监听商品id的变化，请求后端获取商品数据
     productID: function(val) {
       this.getDetails(val);
-      this.getDetailsPicture(val);
+      //this.getDetailsPicture(val);
     }
   },
   methods: {
-    ...mapActions(["unshiftShoppingCart", "addShoppingCartNum"]),
+    //...mapActions(["unshiftShoppingCart", "addShoppingCartNum"]),
     // 获取商品详细信息
     getDetails(val) {
       this.$axios
-        .post("/api/product/getDetails", {
-          productID: val
+        .get("/api/listCommodityById", {
+          params:{
+            bid:val
+          }
         })
         .then(res => {
-          this.productDetails = res.data.Product[0];
+          this.productDetails = res.data;
+          this.productPicture = res.data.picture;
         })
         .catch(err => {
           return Promise.reject(err);
         });
     },
     // 获取商品图片
-    getDetailsPicture(val) {
-      this.$axios
-        .post("/api/product/getDetailsPicture", {
-          productID: val
-        })
-        .then(res => {
-          this.productPicture = res.data.ProductPicture;
-        })
-        .catch(err => {
-          return Promise.reject(err);
-        });
-    },
+    // getDetailsPicture(val) {
+    //   this.$axios
+    //     .post("/api/product/getDetailsPicture", {
+    //       productID: val
+    //     })
+    //     .then(res => {
+    //       this.productPicture = res.data.ProductPicture;
+    //     })
+    //     .catch(err => {
+    //       return Promise.reject(err);
+    //     });
+    // },
     // 加入购物车
     addShoppingCart() {
       // 判断是否登录,没有登录则显示登录组件

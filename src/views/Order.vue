@@ -24,8 +24,8 @@
         <ul>
           <!-- 我的订单表头 -->
           <li class="order-info">
-            <div class="order-id">订单编号: {{item[0].order_id}}</div>
-            <div class="order-time">订单时间: {{item[0].order_time | dateFormat}}</div>
+            <div class="order-id">订单编号: {{item.orderId}}</div>
+            <div class="order-time">订单时间: {{item.createDate}}</div>
           </li>
           <li class="header">
             <div class="pro-img"></div>
@@ -37,37 +37,37 @@
           <!-- 我的订单表头END -->
 
           <!-- 订单列表 -->
-          <li class="product-list" v-for="(product,i) in item" :key="i">
+          <li class="product-list">
             <div class="pro-img">
-              <router-link :to="{ path: '/goods/details', query: {productID:product.product_id} }">
-                <img :src="$target + product.product_picture" />
+              <router-link :to="{ path: '/goods/details', query: {productID:item.bid} }">
+                <img :src="item.commodity.picture" />
               </router-link>
             </div>
             <div class="pro-name">
               <router-link
-                :to="{ path: '/goods/details', query: {productID:product.product_id} }"
-              >{{product.product_name}}</router-link>
+                :to="{ path: '/goods/details', query: {productID:item.bid} }"
+              >{{item.commodity.bname}}</router-link>
             </div>
-            <div class="pro-price">{{product.product_price}}元</div>
-            <div class="pro-num">{{product.product_num}}</div>
-            <div class="pro-total pro-total-in">{{product.product_price*product.product_num}}元</div>
+            <div class="pro-price">{{item.unitPrice}}元</div>
+            <div class="pro-num">{{item.number}}</div>
+            <div class="pro-total pro-total-in">{{item.unitPrice*item.number}}元</div>
           </li>
         </ul>
         <div class="order-bar">
           <div class="order-bar-left">
             <span class="order-total">
               共
-              <span class="order-total-num">{{total[index].totalNum}}</span> 件商品
+              <span class="order-total-num">1</span> 件商品
             </span>
           </div>
           <div class="order-bar-right">
             <span>
               <span class="total-price-title">合计：</span>
-              <span class="total-price">{{total[index].totalPrice}}元</span>
+              <span class="total-price">{{item.unitPrice*item.number}}元</span>
             </span>
           </div>
-          <!-- 订单列表END -->
-        </div>
+          </div>
+        <!-- 订单列表END -->
       </div>
       <div style="margin-top:-40px;"></div>
     </div>
@@ -94,12 +94,14 @@ export default {
   activated() {
     // 获取订单数据
     this.$axios
-      .post("/api/user/order/getOrder", {
-        user_id: this.$store.getters.getUser.user_id
+      .get("/api/orderGoodsListByUid", {
+        params:{
+        uid: this.$store.getters.getUser.uid}
       })
       .then(res => {
-        if (res.data.code === "001") {
-          this.orders = res.data.orders;
+        if (res.data.code === 200) {
+          this.orders = res.data.data;
+          console.log(this.orders);
         } else {
           this.notifyError(res.data.msg);
         }
@@ -110,22 +112,22 @@ export default {
   },
   watch: {
     // 通过订单信息，计算出每个订单的商品数量及总价
-    orders: function(val) {
-      let total = [];
-      for (let i = 0; i < val.length; i++) {
-        const element = val[i];
+    // orders: function(val) {
+    //   let total = [];
+    //   for (let i = 0; i < val.length; i++) {
+    //     const element = val[i];
 
-        let totalNum = 0;
-        let totalPrice = 0;
-        for (let j = 0; j < element.length; j++) {
-          const temp = element[j];
-          totalNum += temp.product_num;
-          totalPrice += temp.product_price * temp.product_num;
-        }
-        total.push({ totalNum, totalPrice });
-      }
-      this.total = total;
-    }
+    //     let totalNum = 0;
+    //     let totalPrice = 0;
+    //     for (let j = 0; j < element.length; j++) {
+    //       const temp = element[j];
+    //       totalNum += temp.product_num;
+    //       totalPrice += temp.product_price * temp.product_num;
+    //     }
+    //     total.push({ totalNum, totalPrice });
+    //   }
+    //   this.total = total;
+    // }
   }
 };
 </script>

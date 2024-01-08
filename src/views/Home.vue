@@ -10,8 +10,8 @@
     <!-- 轮播图 -->
     <div class="block">
       <el-carousel height="460px">
-        <el-carousel-item v-for="item in carousel" :key="item.carousel_id">
-          <img style="height:460px;" :src="$target + item.imgPath" :alt="item.describes" />
+        <el-carousel-item v-for="item in carousel" :key="item.buId">
+          <img style="height:460px;" :src='item.picture' :alt="item.address" />
         </el-carousel-item>
       </el-carousel>
     </div>
@@ -102,7 +102,7 @@
 export default {
   data() {
     return {
-      carousel: "", // 轮播图数据
+      carousel: [], // 轮播图数据
       phoneList: "", // 手机商品列表
       miTvList: "", // 小米电视商品列表
       applianceList: "", // 家电商品列表
@@ -160,28 +160,18 @@ export default {
   created() {
     // 获取轮播图数据
     this.$axios
-      .post("/api/resources/carousel", {})
+      .post("/api/imgTest", {})
       .then(res => {
-        this.carousel = res.data.carousel;
+        this.carousel = res.data.data;
+        console.log(this.carousel);
       })
       .catch(err => {
         return Promise.reject(err);
       });
     // 获取各类商品数据
-    this.getPromo("手机", "phoneList");
-    this.getPromo("电视机", "miTvList");
-    this.getPromo("保护套", "protectingShellList");
-    this.getPromo("充电器", "chargerList");
-    this.getPromo(
-      ["电视机", "空调", "洗衣机"],
-      "applianceList",
-      "/api/product/getHotProduct"
-    );
-    this.getPromo(
-      ["保护套", "保护膜", "充电器", "充电宝"],
-      "accessoryList",
-      "/api/product/getHotProduct"
-    );
+    this.getPromo(2, "phoneList");
+    this.getPromo(4,"applianceList");
+    this.getPromo(7,"accessoryList");
   },
   methods: {
     // 获取家电模块子组件传过来的数据
@@ -194,13 +184,15 @@ export default {
     },
     // 获取各类商品数据方法封装
     getPromo(categoryName, val, api) {
-      api = api != undefined ? api : "/api/product/getPromoProduct";
+      api = api != undefined ? api :"/api/listCommodityByType";
       this.$axios
-        .post(api, {
-          categoryName
+        .get(api,{
+          params:{
+            tid:categoryName
+          }
         })
         .then(res => {
-          this[val] = res.data.Product;
+          this[val] = res.data.data;
         })
         .catch(err => {
           return Promise.reject(err);

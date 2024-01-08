@@ -25,7 +25,7 @@
                   <el-button size="mini" type="text" @click="visible = false">取消</el-button>
                   <el-button type="primary" size="mini" @click="logout">确定</el-button>
                 </div>
-                <el-button type="text" slot="reference">{{this.$store.getters.getUser.userName}}</el-button>
+                <el-button type="text" slot="reference">{{this.$store.getters.getUser.uname}}</el-button>
               </el-popover>
             </li>
             <li>
@@ -137,7 +137,9 @@ export default {
   },
   created() {
     // 获取浏览器localStorage，判断用户是否已经登录
+    console.log(localStorage.getItem("user"));
     if (localStorage.getItem("user")) {
+
       // 如果已经登录，设置vuex登录状态
       this.setUser(JSON.parse(localStorage.getItem("user")));
     }
@@ -164,23 +166,24 @@ export default {
         // 用户没有登录
         this.setShoppingCart([]);
       } else {
+        console.log(val);
         // 用户已经登录,获取该用户的购物车信息
-        this.$axios
-          .post("/api/user/shoppingCart/getShoppingCart", {
-            user_id: val.user_id
-          })
-          .then(res => {
-            if (res.data.code === "001") {
-              // 001 为成功, 更新vuex购物车状态
-              this.setShoppingCart(res.data.shoppingCartData);
-            } else {
-              // 提示失败信息
-              this.notifyError(res.data.msg);
-            }
-          })
-          .catch(err => {
-            return Promise.reject(err);
-          });
+        // this.$axios
+        //   .post("/api/user/shoppingCart/getShoppingCart", {
+        //     user_id: val.user_id
+        //   })
+        //   .then(res => {
+        //     if (res.data.code === "001") {
+        //       // 001 为成功, 更新vuex购物车状态
+        //       this.setShoppingCart(res.data.shoppingCartData);
+        //     } else {
+        //       // 提示失败信息
+        //       this.notifyError(res.data.msg);
+        //     }
+        //   })
+        //   .catch(err => {
+        //     return Promise.reject(err);
+        //   });
       }
     }
   },
