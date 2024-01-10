@@ -21,7 +21,7 @@
         <!-- 手机商品展示区域 -->
         <div class="phone">
           <div class="box-hd">
-            <div class="title">手机</div>
+            <div class="title">言情</div>
           </div>
           <div class="box-bd">
             <div class="promo-list">
@@ -39,11 +39,11 @@
         <!-- 家电商品展示区域 -->
         <div class="appliance" id="promo-menu">
           <div class="box-hd">
-            <div class="title">家电</div>
+            <div class="title">武侠</div>
             <div class="more" id="more">
               <MyMenu :val="2" @fromChild="getChildMsg">
-                <span slot="1">热门</span>
-                <span slot="2">电视影音</span>
+                <span slot="1">开发中</span>
+                <span slot="2">开发中</span>
               </MyMenu>
             </div>
           </div>
@@ -68,12 +68,12 @@
         <!-- 配件商品展示区域 -->
         <div class="accessory" id="promo-menu">
           <div class="box-hd">
-            <div class="title">配件</div>
+            <div class="title">娱乐</div>
             <div class="more" id="more">
               <MyMenu :val="3" @fromChild="getChildMsg2">
-                <span slot="1">热门</span>
-                <span slot="2">保护套</span>
-                <span slot="3">充电器</span>
+                <span slot="1">开发中</span>
+                <span slot="2">开发中</span>
+                <span slot="3">开发中</span>
               </MyMenu>
             </div>
           </div>

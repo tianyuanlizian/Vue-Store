@@ -137,7 +137,6 @@ export default {
       }
       // 校验是否以密码一致
       if (this.RegisterUser.pass != "" && value === this.RegisterUser.pass) {
-        this.$refs.ruleForm.validateField("checkPass");
         return callback();
       } else {
         return callback(new Error("两次输入的密码不一致"));
@@ -195,18 +194,19 @@ export default {
   },
   methods: {
     Register() {
-      // 通过element自定义表单校验规则，校验用户输入的用户信息
-      this.$refs["ruleForm"].validate(valid => {
-        //如果通过校验开始注册
-        if (valid) {
           this.$axios
-            .post("/api/users/register", {
-              userName: this.RegisterUser.name,
-              password: this.RegisterUser.pass
+            .post("/api/appRegister", {
+              name: this.RegisterUser.name,
+              account:this.RegisterUser.account,
+              password: this.RegisterUser.confirmPass,
+              sex:this.RegisterUser.sex,
+              email: this.RegisterUser.email,
+              photo: this.RegisterUser.photo,
+              phone: this.RegisterUser.phone
             })
             .then(res => {
               // “001”代表注册成功，其他的均为失败
-              if (res.data.code === "001") {
+              if (res.data.code === 200) {
                 // 隐藏注册组件
                 this.isRegister = false;
                 // 弹出通知框提示注册成功信息
@@ -218,12 +218,8 @@ export default {
             })
             .catch(err => {
               return Promise.reject(err);
-            });
-        } else {
-          return false;
-        }
-      });
-    },
+            })
+        },
     beforeAvatarUpload(file) {
        const isLt2M = file.size / 1024 / 1024 < 2;
        if (!isLt2M) {
@@ -234,8 +230,8 @@ export default {
    handleAvatarSuccess(res) {
       this.RegisterUser.photo = res; // 假设后端返回的是图片的访问路径
   },
+}
   }
-};
 </script>
 <style>
 @import url("//unpkg.com/element-ui@2.15.14/lib/theme-chalk/index.css");

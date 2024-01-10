@@ -21,7 +21,7 @@
           <h2>{{item.bname}}</h2>
           <h3>{{item.author}}</h3>
           <p>
-            <span>{{item.press}}元</span>
+            <span>{{item.inventory}}元</span>
             <span
               v-show="item.product_price != item.product_selling_price"
               class="del"

@@ -47,7 +47,7 @@ export default {
       .then(res => {
         if (res.data.code === 200) {
           this.collectList = res.data.data;
-          console.log(res.data.data)
+          console.log(res)
         }
       })
       .catch(err => {

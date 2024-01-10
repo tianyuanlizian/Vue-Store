@@ -63,10 +63,10 @@
         <div class="pro-policy">
           <ul>
             <li>
-              <i class="el-icon-circle-check"></i> 小米自营
+              <i class="el-icon-circle-check"></i> 个人自营
             </li>
             <li>
-              <i class="el-icon-circle-check"></i> 小米发货
+              <i class="el-icon-circle-check"></i> 自动发货
             </li>
             <li>
               <i class="el-icon-circle-check"></i> 7天无理由退货
@@ -137,6 +137,7 @@ export default {
     //       return Promise.reject(err);
     //     });
     // },
+    
     // 加入购物车
     addShoppingCart() {
       // 判断是否登录,没有登录则显示登录组件
@@ -181,12 +182,12 @@ export default {
         return;
       }
       this.$axios
-        .post("/api/user/collect/addCollect", {
-          user_id: this.$store.getters.getUser.user_id,
-          product_id: this.productID
+        .post("/api/addCollect", {
+          uid: this.$store.getters.getUser.uid,
+          bid: this.productID
         })
         .then(res => {
-          if (res.data.code == "001") {
+          if (res.data.code == 200) {
             // 添加收藏成功
             this.notifySucceed(res.data.msg);
           } else {
