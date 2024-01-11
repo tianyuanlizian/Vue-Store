@@ -24,6 +24,7 @@ export default {
   getters: {
     getShoppingCart (state) {
       // 获取购物车状态
+      console.log(state.shoppingCart)
       return state.shoppingCart;
     },
     getNum (state) {
@@ -77,7 +78,7 @@ export default {
       for (let i = 0; i < state.shoppingCart.length; i++) {
         const temp = state.shoppingCart[i];
         if (temp.check) {
-          totalPrice += temp.price * temp.num;
+          totalPrice += temp.commodity.inventory * temp.num;
         }
       }
       return totalPrice;
@@ -91,6 +92,7 @@ export default {
     unshiftShoppingCart (state, data) {
       // 添加购物车
       // 用于在商品详情页点击添加购物车,后台添加成功后，更新vuex状态
+      console.log(data)
       state.shoppingCart.unshift(data);
     },
     updateShoppingCart (state, payload) {
@@ -109,23 +111,21 @@ export default {
       // 根据商品在购物车的数组的索引和属性更改
       state.shoppingCart[payload.key][payload.prop] = payload.val;
     },
-    addShoppingCartNum (state, productID) {
+    addShoppingCartNum (state,productID) {
       // 增加购物车商品数量
       // 用于在商品详情页点击添加购物车,后台返回002，“该商品已在购物车，数量 +1”，更新vuex的商品数量
       for (let i = 0; i < state.shoppingCart.length; i++) {
         const temp = state.shoppingCart[i];
-        if (temp.productID == productID) {
-          if (temp.num < temp.maxNum) {
-            temp.num++;
-          }
+        if (temp.bid == productID) {
+          temp.num++;
         }
       }
     },
-    deleteShoppingCart (state, id) {
+    deleteShoppingCart (state,productID) {
       // 根据购物车id删除购物车商品
       for (let i = 0; i < state.shoppingCart.length; i++) {
         const temp = state.shoppingCart[i];
-        if (temp.id == id) {
+        if (temp.bid == productID) {
           state.shoppingCart.splice(i, 1);
         }
       }

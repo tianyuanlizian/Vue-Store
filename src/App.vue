@@ -167,23 +167,27 @@ export default {
         this.setShoppingCart([]);
       } else {
         console.log(val);
-        // 用户已经登录,获取该用户的购物车信息
-        // this.$axios
-        //   .post("/api/user/shoppingCart/getShoppingCart", {
-        //     user_id: val.user_id
-        //   })
-        //   .then(res => {
-        //     if (res.data.code === "001") {
-        //       // 001 为成功, 更新vuex购物车状态
-        //       this.setShoppingCart(res.data.shoppingCartData);
-        //     } else {
-        //       // 提示失败信息
-        //       this.notifyError(res.data.msg);
-        //     }
-        //   })
-        //   .catch(err => {
-        //     return Promise.reject(err);
-        //   });
+        //用户已经登录,获取该用户的购物车信息
+        this.$axios
+          .get("/api/listShoppingCartById", {params:{
+            uid: val.uid}
+          })
+          .then(res => {
+            if (res.data.code === 200) {
+              const sq = res.data.data;
+              sq.forEach(item => {
+              item.check = false;
+            });
+              // 001 为成功, 更新vuex购物车状态
+              this.setShoppingCart(sq);
+            } else {
+              // 提示失败信息
+              this.notifyError(res.data.msg);
+            }
+          })
+          .catch(err => {
+            return Promise.reject(err);
+          });
       }
     }
   },

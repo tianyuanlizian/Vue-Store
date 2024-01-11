@@ -83,7 +83,7 @@
   </div>
 </template>
 <script>
-//import { mapActions } from "vuex";
+import { mapActions } from "vuex";
 export default {
   data() {
     return {
@@ -96,7 +96,7 @@ export default {
   // 通过路由获取商品id
   activated() {
     if (this.$route.query.productID != undefined) {
-      this.productID = this.$route.query.productID;
+      this.productID = Number(this.$route.query.productID);
     }
   },
   watch: {
@@ -107,7 +107,7 @@ export default {
     }
   },
   methods: {
-    //...mapActions(["unshiftShoppingCart", "addShoppingCartNum"]),
+    ...mapActions(["unshiftShoppingCart", "addShoppingCartNum"]),
     // 获取商品详细信息
     getDetails(val) {
       this.$axios
@@ -146,29 +146,31 @@ export default {
         return;
       }
       this.$axios
-        .post("/api/user/shoppingCart/addShoppingCart", {
-          user_id: this.$store.getters.getUser.user_id,
-          product_id: this.productID
+        .post("/api/addShoppingCart", {
+          uid: this.$store.getters.getUser.uid,
+          bid: this.productID
         })
         .then(res => {
+          
+          
           switch (res.data.code) {
-            case "001":
+            case 200:
               // 新加入购物车成功
-              this.unshiftShoppingCart(res.data.shoppingCartData[0]);
-              this.notifySucceed(res.data.msg);
+              this.unshiftShoppingCart(Object.assign(res.data.data,{check: false}));
+              this.notifySucceed("加入成功");
               break;
-            case "002":
+            case 201:
               // 该商品已经在购物车，数量+1
               this.addShoppingCartNum(this.productID);
-              this.notifySucceed(res.data.msg);
+              this.notifySucceed("该商品已经在购物车，数量+1");
               break;
-            case "003":
+            case 202:
               // 商品数量达到限购数量
               this.dis = true;
-              this.notifyError(res.data.msg);
+              this.notifyError("商品数量达到限购数量");
               break;
             default:
-              this.notifyError(res.data.msg);
+              this.notifyError("加入购物车失败");
           }
         })
         .catch(err => {
